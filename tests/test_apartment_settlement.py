@@ -1,80 +1,39 @@
 from src.manager import Manager
-from src.models import Parameters, Bill, Transfer
+from src.models import Parameters, ApartmentSettlement, Bill
 
 
-def test_get_apartment_settlement():
+def test_get_apartment_settlement_with_bills():
     manager = Manager(Parameters())
+    
+    settlement = manager.get_apartment_settlement('apart-polanka', 2025, 1)
+    
+    assert settlement is not None
+    assert isinstance(settlement, ApartmentSettlement)
+    assert settlement.apartment == 'apart-polanka'
+    assert settlement.month == 1
+    assert settlement.year == 2025
+    assert settlement.total_rent_pln == 4200.0
+    assert settlement.total_bills_pln == 910.0
+    assert settlement.total_due_pln == 5110.0
 
-    manager.bills.append(Bill(
-        apartment='apart-polanka',
-        date_due='2025-02-15',
-        settlement_year=2025,
-        settlement_month=2,
-        amount_pln=150.0,
-        type='electricity'
-    ))
 
-    manager.bills.append(Bill(
-        apartment='apart-polanka',
-        date_due='2025-02-15',
-        settlement_year=2025,
-        settlement_month=2,
-        amount_pln=200.0,
-        type='water'
-    ))
-
-    manager.transfers.append(Transfer(
-        amount_pln=2500.0,
-        date='2025-02-04',
-        settlement_year=2025,
-        settlement_month=2,
-        tenant='tenant-1'
-    ))
-
-    manager.transfers.append(Transfer(
-        amount_pln=2500.0,
-        date='2025-02-05',
-        settlement_year=2025,
-        settlement_month=2,
-        tenant='tenant-2'
-    ))
-
-    settlement = manager.get_apartment_settlement('apart-polanka', 2025, 2)
-
+def test_get_apartment_settlement_without_bills_in_month():
+    manager = Manager(Parameters())
+    
+    settlement = manager.get_apartment_settlement('apart-polanka', 2025, 12)
+    
     assert settlement is not None
     assert settlement.apartment == 'apart-polanka'
+    assert settlement.month == 12
     assert settlement.year == 2025
-    assert settlement.month == 2
-    assert settlement.total_bills_pln == 350.0
-    assert settlement.total_rent_pln == 5000.0
-    assert settlement.total_due_pln == 4650.0
-
-
-def test_get_apartment_settlement_no_bills():
-    manager = Manager(Parameters())
-
-    manager.transfers.append(Transfer(
-        amount_pln=2500.0,
-        date='2025-03-04',
-        settlement_year=2025,
-        settlement_month=3,
-        tenant='tenant-1'
-    ))
-
-    manager.transfers.append(Transfer(
-        amount_pln=2500.0,
-        date='2025-03-05',
-        settlement_year=2025,
-        settlement_month=3,
-        tenant='tenant-2'
-    ))
-
-    settlement = manager.get_apartment_settlement('apart-polanka', 2025, 3)
-
-    assert settlement is not None
-    assert settlement.apartment == 'apart-polanka'
-    assert settlement.year == 2025
-    assert settlement.month == 3
+    assert settlement.total_rent_pln == 4200.0
     assert settlement.total_bills_pln == 0.0
-    assert settlement.total_rent_pln == 5000.0
-    assert settlement.total_due_pln == 5000.0
+    assert settlement.total_due_pln == 4200.0
+
+
+def test_get_apartment_settlement_nonexistent_apartment():
+    manager = Manager(Parameters())
+    
+    settlement = manager.get_apartment_settlement('nonexistent', 2025, 1)
+    
+    assert settlement is None
