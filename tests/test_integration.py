@@ -36,13 +36,10 @@ def test_get_apartment_costs():
     manager = Manager(parameters)
     
     costs = manager.get_apartment_costs('apart-polanka', 2025, 1)
-    assert isinstance(costs, dict)
+    assert isinstance(costs, float)
     
-    try:
-        manager.get_apartment_costs('non-existent-apartment', 2025, 1)
-        assert False
-    except KeyError:
-        assert True
+    costs = manager.get_apartment_costs('non-existent-apartment', 2025, 1)
+    assert costs is None
     
     costs = manager.get_apartment_costs('apart-polanka', 2025, 12)
-    assert costs == {}
+    assert costs == 0.0
