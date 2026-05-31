@@ -32,17 +32,17 @@ def test_if_tenants_have_valid_apartment_keys():
     assert manager.check_tenants_apartment_keys() == False
 
 def test_get_apartment_costs():
+
     parameters = Parameters()
     manager = Manager(parameters)
     
+
     costs = manager.get_apartment_costs('apart-polanka', 2025, 1)
-    assert isinstance(costs, dict)
+    assert isinstance(costs, float)
+    assert costs > 0
     
-    try:
-        manager.get_apartment_costs('non-existent-apartment', 2025, 1)
-        assert False
-    except KeyError:
-        assert True
+    costs = manager.get_apartment_costs('non-existent-apartment', 2025, 1)
+    assert costs is None
     
     costs = manager.get_apartment_costs('apart-polanka', 2025, 12)
-    assert costs == {}
+    assert costs == 0.0
